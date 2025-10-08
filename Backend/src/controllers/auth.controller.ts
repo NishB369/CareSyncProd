@@ -10,7 +10,7 @@ export const login = async (req: Request, res: Response) => {
     httpOnly: true,
     secure: true,
     sameSite: "none" as const,
-    path: "/"
+    path: "/",
     maxAge: 1000 * 60 * 60 * 24,
   });
 
@@ -26,7 +26,7 @@ export const logout = async (req: Request, res: Response) => {
     httpOnly: true,
     secure: true,
     sameSite: "none" as const,
-    path: "/"
+    path: "/",
   });
 
   res.json({
