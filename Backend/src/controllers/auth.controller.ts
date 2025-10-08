@@ -8,8 +8,9 @@ export const login = async (req: Request, res: Response) => {
 
   res.cookie("careSyncAccessToken", accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV == "production",
-    sameSite: "strict",
+    secure: true,
+    sameSite: "none" as const,
+    path: "/"
     maxAge: 1000 * 60 * 60 * 24,
   });
 
@@ -23,8 +24,9 @@ export const login = async (req: Request, res: Response) => {
 export const logout = async (req: Request, res: Response) => {
   res.clearCookie("careSyncAccessToken", {
     httpOnly: true,
-    secure: process.env.NODE_ENV == "production",
-    sameSite: "strict",
+    secure: true,
+    sameSite: "none" as const,
+    path: "/"
   });
 
   res.json({
