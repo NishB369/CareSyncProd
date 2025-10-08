@@ -1,63 +1,95 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import EmptyState from "./Components/EmptyState";
 import { ChevronDown } from "lucide-react";
 import AddToQueueModal from "./Modals/AddToQueueModal";
 import AddAppointmentModal from "../appointments/Modals/AddApointmentModal";
 
-// Initial queue data — Indian clinic context
-const initialQueue = [
-  {
-    id: "q-001",
-    patientName: "Rajesh Kumar",
-    phone: "+91 98765 43210",
-    reason: "Fever and cough",
-    queueNumber: "001",
-    status: "waiting" as const,
-    isUrgent: false,
-  },
-  {
-    id: "q-002",
-    patientName: "Priya Sharma",
-    phone: "+91 87654 32109",
-    reason: "Skin rash consultation",
-    queueNumber: "002",
-    status: "withDoctor" as const,
-    isUrgent: false,
-  },
-  {
-    id: "q-003",
-    patientName: "Amit Verma",
-    phone: "+91 76543 21098",
-    reason: "Chest pain – needs immediate attention",
-    queueNumber: "003",
-    status: "waiting" as const,
-    isUrgent: true,
-  },
-  {
-    id: "q-004",
-    patientName: "Sunita Patel",
-    phone: "+91 98123 45678",
-    reason: "Follow-up for diabetes",
-    queueNumber: "004",
-    status: "completed" as const,
-    isUrgent: false,
-  },
-];
-
-// const initialQueue = [];
-
+// Types
 type QueueStatus = "waiting" | "withDoctor" | "completed" | "all";
+
+interface QueueItem {
+  id: string;
+  patientName: string;
+  phone: string;
+  reason: string;
+  queueNumber: string;
+  status: QueueStatus;
+  isUrgent: boolean;
+}
+
+const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const ManageQueue = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<QueueStatus>("all");
-  const [queueData, setQueueData] = useState(initialQueue);
+  const [queueData, setQueueData] = useState<QueueItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isAddtoQueueModalOpen, setIsAddtoQueueModalOpen] = useState(false);
   const [isWalkInModalOpen, setIsWalkInModalOpen] = useState(false);
 
-  //   const filteredQueue = [];
+  // Fetch queue data from backend
+  useEffect(() => {
+    const fetchQueue = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${baseUrl}/api/queue/all`, {
+          withCredentials: true, // if using cookies for auth
+        });
+
+        if (response.data.success) {
+          const doctors = response.data.data;
+
+          // Flatten appointments into a single queue list
+          const allAppointments: QueueItem[] = [];
+          doctors.forEach((doctor: any) => {
+            doctor.appointments.forEach((appt: any) => {
+              // Map backend appointment to frontend QueueItem
+              allAppointments.push({
+                id: appt.id,
+                patientName: appt.patient.name,
+                phone: appt.patient.phoneNumber || "N/A",
+                reason: appt.reason || "General consultation", // adjust if your backend has 'reason'
+                queueNumber: String(appt.queueNumber).padStart(3, "0"), // e.g., "001"
+                status:
+                  appt.status === "completed"
+                    ? "completed"
+                    : appt.status === "withDoctor"
+                    ? "withDoctor"
+                    : "waiting",
+                isUrgent: appt.isUrgent || false, // ensure your backend sends this
+              });
+            });
+          });
+
+          // Sort by queueNumber numerically
+          allAppointments.sort((a, b) => {
+            return parseInt(a.queueNumber) - parseInt(b.queueNumber);
+          });
+
+          setQueueData(allAppointments);
+        } else {
+          setError("Failed to load queue data");
+        }
+      } catch (err: any) {
+        console.error("Error fetching queue:", err);
+        setError(err.response?.data?.message || "Unable to connect to server");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (baseUrl) {
+      fetchQueue();
+    } else {
+      setError("Backend URL not configured");
+      setLoading(false);
+    }
+  }, [baseUrl]);
+
   const filteredQueue = queueData.filter((item) => {
     const matchesSearch =
       item.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -70,25 +102,33 @@ const ManageQueue = () => {
   });
 
   const handleStatusChange = (id: string, newStatus: string) => {
-    setQueueData((prevQueue) =>
-      prevQueue.map((item) =>
-        item.id === id
-          ? { ...item, status: newStatus as Exclude<QueueStatus, "all"> }
-          : item
+    // TODO: Send status update to backend (optional for now)
+    setQueueData((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, status: newStatus as QueueStatus } : item
       )
     );
     console.log(`Updated queue item ${id} to status: ${newStatus}`);
   };
 
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        <p>{error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen p-2 tracking-tighter">
       <div className="max-w-7xl mx-auto space-y-4 pb-40">
-        {/* Header */}
+        {/* === Always visible: Header === */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <h1 className="tracking-tighter text-4xl font-light">
             Manage <span className="font-medium">Queue</span>
           </h1>
-          {filteredQueue.length !== 0 && (
+          {/* Only show buttons if we have data (or not loading) */}
+          {!loading && filteredQueue.length !== 0 && (
             <div className="flex items-center justify-center gap-2">
               <button
                 className="px-4 py-2 bg-[#035670] text-white rounded-lg text-sm font-medium hover:bg-[#024a60] transition-colors border-2 border-transparent cursor-pointer"
@@ -106,8 +146,8 @@ const ManageQueue = () => {
           )}
         </div>
 
-        {/* Search & Status Pills */}
-        {filteredQueue.length !== 0 && (
+        {/* === Search & Filters (only when not loading) === */}
+        {!loading && filteredQueue.length !== 0 && (
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mt-4">
             <div className="flex-1 max-w-md">
               <input
@@ -145,8 +185,14 @@ const ManageQueue = () => {
           </div>
         )}
 
-        {/* Queue List */}
-        {filteredQueue.length === 0 ? (
+        {/* === LOADING SPINNER HERE (after heading, in content area) === */}
+        {loading ? (
+          <div className="flex justify-center items-center py-56">
+            <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-b-2 border-[#035670]"></div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-8 text-red-600">{error}</div>
+        ) : filteredQueue.length === 0 ? (
           <EmptyState />
         ) : (
           <div className="space-y-3">
@@ -155,28 +201,21 @@ const ManageQueue = () => {
                 key={item.id}
                 className="flex items-center p-3 border rounded-lg hover:bg-gray-50"
               >
-                {/* Queue Number */}
                 <div className="font-bold text-lg min-w-[70px] text-center">
                   #{item.queueNumber}
                 </div>
-
-                {/* Patient Info */}
                 <div className="flex-1 min-w-[220px] pl-4">
                   <p className="font-medium text-sm">{item.patientName}</p>
                   <p className="text-xs text-gray-600">
                     {item.phone} • {item.reason}
                   </p>
                 </div>
-
-                {/* Urgent Pill (Only if urgent) */}
                 {item.isUrgent && (
                   <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full whitespace-nowrap min-w-[90px] text-center mr-4">
                     ❗ Urgent
                   </span>
                 )}
                 {!item.isUrgent && <div className="min-w-[90px]"></div>}
-
-                {/* Status Dropdown (Right) */}
                 <div className="min-w-[140px] relative">
                   <select
                     value={item.status}
@@ -197,6 +236,7 @@ const ManageQueue = () => {
         )}
       </div>
 
+      {/* Modals */}
       <AddToQueueModal
         isOpen={isAddtoQueueModalOpen}
         onClose={() => setIsAddtoQueueModalOpen(false)}

@@ -212,11 +212,6 @@ const ManageAppointments = () => {
     setCancelModalOpen(true);
   };
 
-  const cancelAppointment = (appointmentId: string) => {
-    console.log(`Cancelled appointment with id: ${appointmentId}`);
-    // TODO: Call cancel API endpoint
-  };
-
   const filteredAppointments = useMemo(() => {
     return appointments.filter((apt) => {
       const matchesSearch =

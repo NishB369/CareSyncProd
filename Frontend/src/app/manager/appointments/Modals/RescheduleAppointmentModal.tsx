@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Appointment } from "../ManageAppointments"; // Adjust path if needed
+import { X } from "lucide-react";
 
 type Props = {
   isOpen: boolean;
@@ -123,7 +124,18 @@ const RescheduleAppointmentModal = ({
     <div className="fixed inset-0 bg-black/25 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-md overflow-hidden">
         <div className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Reschedule Appointment</h2>
+          <div className="w-full relative">
+            <h2 className="text-xl font-semibold mb-4">
+              Reschedule Appointment
+            </h2>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-800 rounded-full p-1 cursor-pointer absolute top-0 right-0 hover:bg-gray-200 duration-100 ease-in-out bg-white"
+              aria-label="Close"
+            >
+              <X size={20} />
+            </button>
+          </div>
 
           {/* Current Appointment Info */}
           <div className="mb-4 p-3 bg-gray-50 rounded-md text-sm">

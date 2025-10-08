@@ -84,7 +84,7 @@ const AppointmentCard = ({
       </div>
 
       {/* Divider */}
-      <div className="hidden sm:block w-px h-12 bg-gray-200 -ml-60 mr-2"></div>
+      <div className="hidden sm:block w-px h-12 bg-gray-200 -ml-24 mr-2"></div>
 
       {/* Doctor Details */}
       <div className="flex-1 min-w-0 flex items-center gap-2 scale-105 pl-3">

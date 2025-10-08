@@ -4,6 +4,7 @@ import { getAllDoctorsQueue } from "../controllers/queue.controller";
 
 const queueRoter = express.Router ();
 
-queueRoter.get ('/all',getAllDoctorsQueue)
+queueRoter.get ('/all', authenticateUser, requiresRole(["STAFF"]) ,getAllDoctorsQueue)
+
 
 export default queueRoter

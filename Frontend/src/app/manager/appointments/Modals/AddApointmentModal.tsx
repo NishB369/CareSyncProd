@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   AlertTriangle,
+  ChevronDown,
 } from "lucide-react";
 import axios from "axios";
 
@@ -582,40 +583,42 @@ const AddAppointmentModal = ({
         e.preventDefault();
         handleConfirm();
       }}
-      className="p-6 space-y-4"
+      className="p-6 space-y-1"
     >
       <button
         type="button"
         onClick={() => setStep(3)}
-        className="flex items-center text-sm text-[#035670] mb-4 cursor-pointer hover:underline"
+        className="flex items-center text-sm text-[#035670] mb-2 cursor-pointer hover:underline"
       >
         <ChevronLeft size={16} /> Back to slots
       </button>
-      <h3 className="text-lg font-medium mb-4">Confirm Appointment</h3>
 
-      <div className="bg-gray-50 p-4 rounded-lg text-sm">
-        <p>
-          <strong>Doctor:</strong> {selectedDoctor?.name} (
-          {selectedDoctor?.specialization})
-        </p>
-        <p>
-          <strong>Date:</strong> {selectedDate?.toDateString()}
-        </p>
-        <p>
-          <strong>Time:</strong>{" "}
-          {selectedSlot?.start.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}{" "}
-          –{" "}
-          {selectedSlot?.end.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </p>
+      <div className="bg-gray-50 p-4 rounded-lg text-sm mb-2">
+        <h1 className="font-medium mb-2">Confirm Appointment Details</h1>
+        <div className="flex items-center justify-start gap-4">
+          <p className="border-r border-gray-400 pr-4">
+            <strong>Doctor:</strong> {selectedDoctor?.name} (
+            {selectedDoctor?.specialization})
+          </p>
+          <p className="border-r border-gray-400 pr-4">
+            <strong>Date:</strong> {selectedDate?.toDateString()}
+          </p>
+          <p>
+            <strong>Time:</strong>{" "}
+            {selectedSlot?.start.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}{" "}
+            –{" "}
+            {selectedSlot?.end.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         <div>
           <label className="block text-sm font-medium mb-1">
             Patient Name *
@@ -626,7 +629,7 @@ const AddAppointmentModal = ({
             onChange={(e) =>
               setPatientInfo({ ...patientInfo, name: e.target.value })
             }
-            className={`w-full px-3 py-2 border rounded-md ${
+            className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-[#035670] focus:outline-none ${
               errors.name ? "border-red-300" : "border-gray-300"
             }`}
             placeholder="Nishchay Bhatia"
@@ -642,7 +645,7 @@ const AddAppointmentModal = ({
             onChange={(e) =>
               setPatientInfo({ ...patientInfo, email: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#035670] focus:outline-none"
             placeholder="nishchay@example.com"
           />
         </div>
@@ -655,7 +658,7 @@ const AddAppointmentModal = ({
             onChange={(e) =>
               setPatientInfo({ ...patientInfo, phone: e.target.value })
             }
-            className={`w-full px-3 py-2 border rounded-md ${
+            className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-[#035670] focus:outline-none ${
               errors.phone ? "border-red-300" : "border-gray-300"
             }`}
             placeholder="+91 98765 43210"
@@ -675,7 +678,7 @@ const AddAppointmentModal = ({
             }
             min="1"
             max="120"
-            className={`w-full px-3 py-2 border rounded-md ${
+            className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-[#035670] focus:outline-none ${
               errors.age ? "border-red-300" : "border-gray-300"
             }`}
             placeholder="20"
@@ -692,11 +695,11 @@ const AddAppointmentModal = ({
             onChange={(e) =>
               setPatientInfo({ ...patientInfo, issue: e.target.value })
             }
-            className={`w-full px-3 py-2 border rounded-md ${
+            className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-[#035670] focus:outline-none ${
               errors.issue ? "border-red-300" : "border-gray-300"
             }`}
             placeholder="Describe the patient's issue..."
-            rows={2}
+            rows={1}
           />
           {errors.issue && (
             <p className="text-red-600 text-sm">{errors.issue}</p>
@@ -711,7 +714,7 @@ const AddAppointmentModal = ({
             onChange={(e) =>
               setPatientInfo({ ...patientInfo, address: e.target.value })
             }
-            className={`w-full px-3 py-2 border rounded-md ${
+            className={`w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-[#035670] focus:outline-none ${
               errors.address ? "border-red-300" : "border-gray-300"
             }`}
             placeholder="123 Main St, City"
@@ -721,7 +724,7 @@ const AddAppointmentModal = ({
           )}
         </div>
 
-        <div>
+        <div className="relative">
           <label className="block text-sm font-medium mb-1">Gender *</label>
           <select
             value={patientInfo.gender}
@@ -731,16 +734,17 @@ const AddAppointmentModal = ({
                 gender: e.target.value as Gender,
               })
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm appearance-none cursor-pointer focus:ring-2 focus:ring-[#035670] focus:outline-none"
           >
             <option value="MALE">Male</option>
             <option value="FEMALE">Female</option>
             <option value="OTHER">Other / Prefer not to say</option>
           </select>
+          <ChevronDown className="absolute right-3 mt-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none" />
         </div>
 
         {forQueue && (
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 my-2">
             <label className="flex items-start cursor-pointer">
               <input
                 type="checkbox"
