@@ -21,13 +21,44 @@ export default function CareSync() {
   const [animatedElements, setAnimatedElements] = useState<Set<string>>(
     new Set()
   );
+  const [isLaptop, setIsLaptop] = useState(true); // Assume laptop by default
 
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const benefitsRef = useRef<HTMLDivElement>(null);
 
+  // Detect device type based on screen dimensions
+  useEffect(() => {
+    const checkDeviceType = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      // Laptop detection logic:
+      // - Width between 1024px and 1920px (typical laptop range)
+      // - Height between 600px and 1200px (typical laptop range)
+      // - Exclude mobile/tablet dimensions
+      const isLaptopScreen =
+        width >= 1024 &&
+        width <= 1920 &&
+        height >= 600 &&
+        height <= 1200 &&
+        !/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
+
+      setIsLaptop(isLaptopScreen);
+    };
+
+    // Initial check
+    checkDeviceType();
+
+    // Handle resize events
+    window.addEventListener("resize", checkDeviceType);
+    return () => window.removeEventListener("resize", checkDeviceType);
+  }, []);
+
   const toDashboard = () => {
-    router.push("/auth/login/manager");
+    isLaptop ? router.push("/auth/login/manager") : router.push("/alertpage");
   };
 
   useEffect(() => {
@@ -71,8 +102,8 @@ export default function CareSync() {
       <nav
         className={`fixed top-0 w-full z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-white/50 backdrop-blur-md shadow-lg px-20"
-            : "bg-white/90 backdrop-blur-sm px-10"
+            ? "bg-white/50 backdrop-blur-md shadow-lg sm:px-20"
+            : "bg-white/90 backdrop-blur-sm sm:px-10"
         }`}
       >
         <div className="max-w-7xl mx-auto px-6">
@@ -149,7 +180,10 @@ export default function CareSync() {
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-0.5 bg-[#035670] transition-all duration-300 group-hover:w-4"></span>
                 Benefits
               </button>
-              <button className="w-full bg-[#035670] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#066885] transition-colors relative overflow-hidden group cursor-pointer">
+              <button
+                className="w-full bg-[#035670] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#066885] transition-colors relative overflow-hidden group cursor-pointer"
+                onClick={toDashboard}
+              >
                 <span className="relative z-10">Get Started</span>
                 <span className="absolute inset-0 bg-gradient-to-r from-[#066885] to-[#035670] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
               </button>
@@ -162,7 +196,7 @@ export default function CareSync() {
       <section
         ref={heroRef}
         id="hero"
-        className="relative pt-32 pb-20 overflow-hidden bg-gradient-to-br from-[#e6f2f5] via-white to-[#e6f2f5] px-20"
+        className="relative pt-32 pb-20 overflow-hidden bg-gradient-to-br from-[#e6f2f5] via-white to-[#e6f2f5] sm:px-20"
       >
         {/* Animated Decorative Elements */}
         <div className="absolute top-20 right-10 w-64 h-64 bg-[#035670]/10 rounded-full blur-3xl animate-pulse-slow"></div>
@@ -212,7 +246,10 @@ export default function CareSync() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up delay-300">
-                <button className="bg-[#035670] text-white px-8 py-4 rounded-xl font-semibold hover:bg-[#066885] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden cursor-pointer">
+                <button
+                  className="bg-[#035670] text-white px-8 py-4 rounded-xl font-semibold hover:bg-[#066885] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden cursor-pointer"
+                  onClick={toDashboard}
+                >
                   <span className="relative z-10">Get Started</span>
                   <ArrowRight
                     size={20}
@@ -310,7 +347,11 @@ export default function CareSync() {
       </section>
 
       {/* Features Section */}
-      <section ref={featuresRef} id="features" className="py-20 bg-white px-20">
+      <section
+        ref={featuresRef}
+        id="features"
+        className="py-20 bg-white sm:px-20"
+      >
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-light mb-4">
@@ -437,7 +478,11 @@ export default function CareSync() {
       </section>
 
       {/* Benefits */}
-      <section ref={benefitsRef} id="benefits" className="py-32 bg-white px-40">
+      <section
+        ref={benefitsRef}
+        id="benefits"
+        className="py-32 bg-white sm:px-40"
+      >
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-light mb-4">
@@ -479,7 +524,7 @@ export default function CareSync() {
       {/* CTA Banner */}
       <section
         id="cta"
-        className="relative py-20 overflow-hidden bg-gradient-to-br from-[#035670] via-[#066885] to-[#035670] px-20"
+        className="relative py-20 overflow-hidden bg-gradient-to-br from-[#035670] via-[#066885] to-[#035670] sm:px-20"
       >
         <div className="absolute top-10 right-10 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-float"></div>
         <div
@@ -505,7 +550,7 @@ export default function CareSync() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-12 px-20">
+      <footer className="bg-gray-900 text-gray-400 py-12 sm:px-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             <div>
@@ -519,7 +564,7 @@ export default function CareSync() {
               </p>
             </div>
 
-            <div>
+            <div className="hidden sm:block">
               <h3 className="text-white font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-sm">
                 <li>
@@ -552,7 +597,7 @@ export default function CareSync() {
               </ul>
             </div>
 
-            <div>
+            <div className="hidden sm:block">
               <h3 className="text-white font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-sm">
                 <li>
@@ -585,7 +630,7 @@ export default function CareSync() {
               </ul>
             </div>
 
-            <div>
+            <div className="hidden sm:block">
               <h3 className="text-white font-semibold mb-4">Legal</h3>
               <ul className="space-y-2 text-sm">
                 <li>
@@ -607,6 +652,98 @@ export default function CareSync() {
                   </a>
                 </li>
               </ul>
+            </div>
+
+            <div className="grid grid-cols-3 sm:hidden">
+              <div>
+                <h3 className="text-white font-semibold mb-4">Product</h3>
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <a
+                      href="#"
+                      className="hover:text-white transition-colors relative group inline-block"
+                    >
+                      Features
+                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="hover:text-white transition-colors relative group inline-block"
+                    >
+                      Pricing
+                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="hover:text-white transition-colors relative group inline-block"
+                    >
+                      Demo
+                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold mb-4">Company</h3>
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <a
+                      href="#"
+                      className="hover:text-white transition-colors relative group inline-block"
+                    >
+                      About Us
+                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="hover:text-white transition-colors relative group inline-block"
+                    >
+                      Contact
+                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="hover:text-white transition-colors relative group inline-block"
+                    >
+                      Careers
+                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold mb-4">Legal</h3>
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <a
+                      href="#"
+                      className="hover:text-white transition-colors relative group inline-block"
+                    >
+                      Privacy Policy
+                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="hover:text-white transition-colors relative group inline-block"
+                    >
+                      Terms of Service
+                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 
