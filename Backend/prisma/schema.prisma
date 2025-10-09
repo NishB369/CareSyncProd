@@ -98,7 +98,7 @@ model Appointment {
   queueType       QueueType         @default(APPOINTMENT)
   status          AppointmentStatus @default(PENDING)
 
-  doctor    Doctor   @relation(fields: [doctorId], references: [id])
+  doctor    Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   patient   Patient  @relation(fields: [patientId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
