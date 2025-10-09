@@ -39,7 +39,6 @@ const EditDoctorModal = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const IMAGE_SIZE_LIMIT = 2 * 1024 * 1024;
 
-  // Initialize form when doctor changes
   useEffect(() => {
     if (isOpen && doctor) {
       setName(doctor.name);
@@ -91,13 +90,12 @@ const EditDoctorModal = ({
       }
       setImageFile(file);
       setImageUrl(URL.createObjectURL(file));
-      //   setErrors((prev) => ({ ...prev, image: undefined }));
     }
   };
 
   const handleImageRemove = () => {
     setImageFile(null);
-    setImageUrl(currentImageUrl); // revert to original
+    setImageUrl(currentImageUrl);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -115,7 +113,6 @@ const EditDoctorModal = ({
     formData.append("specialization", specialization);
     formData.append("isAvailable", String(isAvailable));
 
-    // Only send image if changed
     if (imageFile) {
       formData.append("image", imageFile);
     }

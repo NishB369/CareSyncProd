@@ -21,13 +21,12 @@ export default function CareSync() {
   const [animatedElements, setAnimatedElements] = useState<Set<string>>(
     new Set()
   );
-  const [isLaptop, setIsLaptop] = useState(true); // Assume laptop by default
+  const [isLaptop, setIsLaptop] = useState(true);
 
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const benefitsRef = useRef<HTMLDivElement>(null);
 
-  // Detect device type based on screen dimensions
   useEffect(() => {
     const checkDeviceType = () => {
       const width = window.innerWidth;
@@ -49,10 +48,8 @@ export default function CareSync() {
       setIsLaptop(isLaptopScreen);
     };
 
-    // Initial check
     checkDeviceType();
 
-    // Handle resize events
     window.addEventListener("resize", checkDeviceType);
     return () => window.removeEventListener("resize", checkDeviceType);
   }, []);

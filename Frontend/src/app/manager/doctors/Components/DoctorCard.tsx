@@ -1,5 +1,3 @@
-// ./Components/DoctorCard.tsx
-
 "use client";
 
 import React, { useState } from "react";
@@ -12,7 +10,7 @@ interface DoctorCardProps {
   doctor: Doctor;
   onEdit: (doctor: Doctor) => void;
   onDelete: (doctor: Doctor) => void;
-  onScheduleUpdate?: () => void; // Just a callback to refetch, no data needed
+  onScheduleUpdate?: () => void;
 }
 
 const DoctorCard = ({
@@ -106,14 +104,14 @@ const DoctorCard = ({
         isOpen={isAddSlotsOpen}
         onClose={() => setIsAddSlotsOpen(false)}
         doctorId={doctor.id}
-        currentSchedule={doctor.schedule || {}} // 👈 Safe fallback
-        onSuccess={onScheduleUpdate} // ✅ Just notify parent to refetch
+        currentSchedule={doctor.schedule || {}}
+        onSuccess={onScheduleUpdate}
       />
 
       <ViewSlotsModal
         isOpen={isViewSlotsOpen}
         onClose={() => setIsViewSlotsOpen(false)}
-        schedule={doctor.schedule || {}} // 👈 Safe fallback
+        schedule={doctor.schedule || {}}
       />
     </div>
   );

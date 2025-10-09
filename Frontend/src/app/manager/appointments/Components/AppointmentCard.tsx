@@ -1,4 +1,4 @@
-import { CheckCircleIcon, User } from "lucide-react";
+import { CheckCircleIcon } from "lucide-react";
 import { Appointment } from "../ManageAppointments";
 
 type AppointmentCardProps = {
@@ -19,13 +19,11 @@ const AppointmentCard = ({
   const canCancel = hoursUntil > 6;
   const canReschedule = hoursUntil > 12;
 
-  // Helper to get gender display
   const getGenderDisplay = (gender: string | undefined) => {
     if (!gender) return "N/A";
     return gender === "male" ? "M" : gender === "female" ? "F" : "Other";
   };
 
-  // Helper for doctor initials (fallback if no image)
   const getDoctorInitials = (name: string) => {
     return name
       .split(" ")

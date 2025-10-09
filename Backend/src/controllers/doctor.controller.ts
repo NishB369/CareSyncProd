@@ -4,7 +4,6 @@ import { hashPassword } from "../utils/auth.utils";
 import { v2 as cloudinary } from "cloudinary";
 import { GenderType, UserRole } from "@prisma/client";
 
-// Helper to validate and cast gender
 const parseGender = (gender: string): GenderType | null => {
   const upper = gender?.toUpperCase();
   if (upper === "MALE" || upper === "FEMALE" || upper === "OTHER") {
@@ -71,7 +70,6 @@ const addDoctor = async (req: Request, res: Response) => {
       resource_type: "image",
     });
 
-    // Create doctor first
     const doctor = await prisma.doctor.create({
       data: {
         name,
@@ -80,11 +78,10 @@ const addDoctor = async (req: Request, res: Response) => {
         gender: genderEnum,
         specialization,
         schedule: parsedSchedule,
-        isAvailable: true, // default per schema
+        isAvailable: true,
       },
     });
 
-    // Then create user linked to doctor
     const user = await prisma.user.create({
       data: {
         email,
@@ -201,7 +198,6 @@ const deleteDoctor = async (req: Request, res: Response) => {
       });
     }
 
-    // Delete user first (due to foreign key constraint)
     if (existingDoctor.user) {
       await prisma.user.delete({ where: { id: existingDoctor.user.id } });
     }
@@ -294,11 +290,6 @@ const changeAvailability = async (req: Request, res: Response) => {
 };
 
 const getDoctorAvailableSlotsByDate = async (req: Request, res: Response) => {
-  // Keep this as-is — it's mostly correct and doesn't use invalid fields
-  // (Assuming `schedule` is stored as JSON and parsed properly)
-  // ... (your existing implementation is fine here)
-  // But note: `slot` in Appointment is Json, so comparison logic must handle that.
-  // We'll keep your logic but add a note below.
   try {
     const { id } = req.params;
     const { date } = req.query;
@@ -335,8 +326,6 @@ const getDoctorAvailableSlotsByDate = async (req: Request, res: Response) => {
     const dayName = givenDate
       .toLocaleDateString("en-US", { weekday: "long" })
       .toUpperCase();
-
-    // Parse schedule safely
     let schedule: Record<string, string[]> = {};
     if (typeof doctor.schedule === "string") {
       try {

@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import axios from "axios";
 
-// Define types matching your backend
 type Doctor = {
   id: string;
   name: string;
@@ -61,8 +60,6 @@ const AddAppointmentModal = ({
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
 
-  const NOW = new Date();
-
   useEffect(() => {
     if (isOpen) {
       setStep(1);
@@ -85,7 +82,6 @@ const AddAppointmentModal = ({
     }
   }, [isOpen]);
 
-  // Fetch doctors when modal opens
   useEffect(() => {
     if (isOpen && step === 1) {
       const fetchDoctors = async () => {
@@ -120,13 +116,11 @@ const AddAppointmentModal = ({
     }
   }, [isOpen, step]);
 
-  // Fetch available slots when moving to step 3
   useEffect(() => {
     if (step === 3 && selectedDoctor && selectedDate) {
       const fetchSlots = async () => {
         setLoadingSlots(true);
         try {
-          // Format date as YYYY-MM-DD without timezone conversion
           const dateStr =
             selectedDate.getFullYear() +
             "-" +
@@ -142,15 +136,13 @@ const AddAppointmentModal = ({
           const data = await res.json();
           if (data.success) {
             const parsedSlots = (data.data || []).map((slotStr: string) => {
-              // Split on the dash that separates start and end
               const [startPart, endPart] = slotStr.split("-");
 
               const parseTime12 = (timeStr: string): Date => {
-                // timeStr example: "9:00AM", "12:30PM", "1:45PM"
                 const match = timeStr.trim().match(/(\d{1,2}):(\d{2})(AM|PM)/i);
                 if (!match) {
                   console.warn("Invalid time format:", timeStr);
-                  // fallback: return current date with 00:00
+
                   const d = new Date(
                     selectedDate.getFullYear(),
                     selectedDate.getMonth(),
@@ -171,13 +163,11 @@ const AddAppointmentModal = ({
                 const minutes = parseInt(minutesStr, 10);
                 period = period.toUpperCase();
 
-                // Convert to 24-hour
                 if (period === "AM" && hours === 12) {
-                  hours = 0; // 12:xx AM → 00:xx
+                  hours = 0;
                 } else if (period === "PM" && hours !== 12) {
-                  hours += 12; // 1-11 PM → 13-23
+                  hours += 12;
                 }
-                // 12:xx PM stays 12
 
                 const d = new Date(
                   selectedDate.getFullYear(),
@@ -243,7 +233,6 @@ const AddAppointmentModal = ({
 
     setIsSubmitting(true);
     try {
-      // Format time as "9:00AM" or "12:30PM"
       const formatTime = (date: Date): string => {
         const hours = date.getHours();
         const minutes = date.getMinutes();
@@ -257,7 +246,6 @@ const AddAppointmentModal = ({
         selectedSlot!.end
       )}`;
 
-      // Format appointmentDate as YYYY-MM-DD
       const appointmentDate =
         selectedDate!.getFullYear() +
         "-" +
