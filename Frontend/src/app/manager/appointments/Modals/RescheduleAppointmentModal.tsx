@@ -76,7 +76,7 @@ const RescheduleAppointmentModal = ({
       if (!baseUrl) throw new Error("Backend URL not configured");
 
       await axios.post(
-        `${baseUrl}/api/appointment/reschedule`,
+        `${baseUrl}/api/appointment/reschedule/${appointment.id}`,
         {
           id: appointment.id,
           appointmentDate: newDate,
