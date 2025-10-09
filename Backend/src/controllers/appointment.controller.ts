@@ -453,12 +453,18 @@ const rescheduleAppointment = async (req: Request, res: Response) => {
         .status(400)
         .json({ message: "Doctor not available in this slot" });
 
+    const startOfDay = new Date(appointmentDate);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(appointmentDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
     const sameDayAppointments = await prisma.appointment.findMany({
       where: {
         doctorId: doctor.id,
         appointmentDate: {
-          gte: new Date(date.setHours(0, 0, 0, 0)),
-          lte: new Date(date.setHours(23, 59, 59, 999)),
+          gte: startOfDay,
+          lte: endOfDay,
         },
         NOT: { id },
       },
