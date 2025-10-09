@@ -10,7 +10,7 @@ const EmptyState = () => {
   const [isWalkInModalOpen, setIsWalkInModalOpen] = useState(false);
 
   return (
-    <div className="py-40 border rounded-xl h-full w-full flex flex-col items-center justify-center gap-6 px-40 bg-gray-50">
+    <div className="py-32 border rounded-xl h-full w-full flex flex-col items-center justify-center gap-6 px-40 bg-gray-50">
       <div className="font-light tracking-tighter flex flex-col items-center justify-center text-center gap-1">
         <h1 className="text-3xl">
           No Patients <span className="font-medium">added in Queue yet.</span>
