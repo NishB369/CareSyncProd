@@ -1,10 +1,9 @@
-// ./Modals/RescheduleAppointmentModal.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Appointment } from "../ManageAppointments"; // Adjust path if needed
-import { X } from "lucide-react";
+import { Appointment } from "../ManageAppointments";
+import { ChevronDown, X } from "lucide-react";
 
 type Props = {
   isOpen: boolean;
@@ -25,7 +24,6 @@ const RescheduleAppointmentModal = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Reset form when modal opens/closes or appointment changes
   useEffect(() => {
     if (isOpen && appointment) {
       const today = new Date();
@@ -37,7 +35,6 @@ const RescheduleAppointmentModal = ({
     }
   }, [isOpen, appointment]);
 
-  // Fetch available slots when newDate changes
   useEffect(() => {
     if (!newDate || !appointment) return;
 
@@ -47,7 +44,7 @@ const RescheduleAppointmentModal = ({
         if (!baseUrl) throw new Error("Backend URL not configured");
 
         const res = await axios.get(
-          `${baseUrl}/api/doctor/${appointment.doctor.id}/slots`, // ⚠️ You may need to adjust this endpoint
+          `${baseUrl}/api/doctor/${appointment.doctor.id}/slots`,
           {
             params: { date: newDate },
             withCredentials: true,
@@ -88,7 +85,7 @@ const RescheduleAppointmentModal = ({
         { withCredentials: true }
       );
 
-      onSuccess(); // Refreshes appointment list
+      onSuccess();
       onClose();
     } catch (err: any) {
       console.error("Reschedule failed:", err);
@@ -103,7 +100,6 @@ const RescheduleAppointmentModal = ({
 
   if (!isOpen || !appointment) return null;
 
-  // Format current time for display
   const formatTime = (date: Date): string => {
     return date.toLocaleTimeString([], {
       hour: "2-digit",
@@ -177,20 +173,24 @@ const RescheduleAppointmentModal = ({
               <label className="block text-sm font-medium mb-1">
                 New Time Slot
               </label>
+
               {availableSlots.length > 0 ? (
-                <select
-                  value={newSlot}
-                  onChange={(e) => setNewSlot(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#035670]"
-                  required
-                >
-                  <option value="">Select a slot</option>
-                  {availableSlots.map((slot) => (
-                    <option key={slot} value={slot}>
-                      {slot}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={newSlot}
+                    onChange={(e) => setNewSlot(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#035670] appearance-none cursor-pointer"
+                    required
+                  >
+                    <option value="">Select a slot</option>
+                    {availableSlots.map((slot) => (
+                      <option key={slot} value={slot}>
+                        {slot}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none" />
+                </div>
               ) : (
                 <p className="text-sm text-gray-500">
                   {error || "Select a date to see available slots"}
@@ -204,7 +204,7 @@ const RescheduleAppointmentModal = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -214,7 +214,7 @@ const RescheduleAppointmentModal = ({
                 className={`px-4 py-2 rounded-md text-white transition-colors ${
                   loading || !newSlot
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-[#035670] hover:bg-[#066885]"
+                    : "bg-[#035670] hover:bg-[#066885] cursor-pointer"
                 }`}
               >
                 {loading ? "Rescheduling..." : "Reschedule"}
