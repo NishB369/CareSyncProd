@@ -1,4 +1,3 @@
-// DeleteConfirmationModal.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -8,8 +7,8 @@ import axios from "axios";
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void; // Required: parent passes fetchDoctors
-  doctorId: string; // Need ID to delete
+  onSuccess: () => void;
+  doctorId: string;
   doctorName: string;
 }
 
@@ -41,9 +40,8 @@ const DeleteConfirmationModal = ({
         { withCredentials: true }
       );
 
-      // ✅ Close modal, then notify parent to refresh
       onClose();
-      onSuccess(); // ← this is fetchDoctors from parent
+      onSuccess();
     } catch (err: any) {
       console.error("Delete failed:", err);
       setError(err.response?.data?.message || "Failed to delete doctor");

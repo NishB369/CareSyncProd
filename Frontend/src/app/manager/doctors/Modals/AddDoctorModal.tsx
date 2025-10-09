@@ -67,7 +67,6 @@ const AddDoctorModal = ({
     if (!specialization.trim())
       newErrors.specialization = "Specialization is required";
 
-    // ✅ Validate image is provided
     if (!imageFile) {
       newErrors.image = "Profile photo is required";
     }

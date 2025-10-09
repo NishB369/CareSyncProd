@@ -3,11 +3,16 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import EmptyState from "./Components/EmptyState";
-import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import AddToQueueModal from "./Modals/AddToQueueModal";
 import AddAppointmentModal from "../appointments/Modals/AddApointmentModal";
 
-type QueueStatus = "waiting" | "withDoctor" | "completed" | "all";
+type QueueStatus =
+  | "PENDING"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "ALL";
 
 interface QueueItem {
   id: string;
@@ -30,7 +35,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const ManageQueue = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<QueueStatus>("all");
+  const [statusFilter, setStatusFilter] = useState<QueueStatus>("ALL");
   const [selectedDoctorId, setSelectedDoctorId] = useState<string>("all");
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [allAppointments, setAllAppointments] = useState<
@@ -73,12 +78,7 @@ const ManageQueue = () => {
                 phone: appt.patient.phoneNumber || "N/A",
                 reason: appt.reason || "General consultation",
                 queueNumber: String(appt.queueNumber).padStart(3, "0"),
-                status:
-                  appt.status === "completed"
-                    ? "completed"
-                    : appt.status === "withDoctor"
-                    ? "withDoctor"
-                    : "waiting",
+                status: appt.status,
                 isUrgent: appt.isUrgent || false,
               })
             );
@@ -130,7 +130,7 @@ const ManageQueue = () => {
           item.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.phone.replace(/\D/g, "").includes(searchTerm.replace(/\D/g, ""));
         const matchesStatus =
-          statusFilter === "all" || item.status === statusFilter;
+          statusFilter === "ALL" || item.status === statusFilter;
         return matchesSearch && matchesStatus;
       });
     }
@@ -145,7 +145,7 @@ const ManageQueue = () => {
           item.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.phone.replace(/\D/g, "").includes(searchTerm.replace(/\D/g, ""));
         const matchesStatus =
-          statusFilter === "all" || item.status === statusFilter;
+          statusFilter === "ALL" || item.status === statusFilter;
         return matchesSearch && matchesStatus;
       });
 
@@ -158,11 +158,12 @@ const ManageQueue = () => {
     return hasAny ? result : null;
   }, [selectedDoctorId, allAppointments, doctors, searchTerm, statusFilter]);
 
-  const handleStatusChange = (
+  const handleStatusChange = async (
     doctorId: string,
     appointmentId: string,
     newStatus: string
   ) => {
+    const prevAppointments = { ...allAppointments };
     setAllAppointments((prev) => {
       const updated = { ...prev };
       if (updated[doctorId]) {
@@ -174,6 +175,18 @@ const ManageQueue = () => {
       }
       return updated;
     });
+
+    try {
+      await axios.put(
+        `${baseUrl}/api/appointment/status/${appointmentId}`,
+        { status: newStatus },
+        { withCredentials: true }
+      );
+    } catch (err: any) {
+      console.error("Failed to update appointment status:", err);
+      setAllAppointments(prevAppointments);
+      setError(err.response?.data?.message || "Failed to update status");
+    }
   };
 
   if (error) {
@@ -183,6 +196,21 @@ const ManageQueue = () => {
       </div>
     );
   }
+
+  const getStatusLabel = (status: QueueStatus) => {
+    switch (status) {
+      case "PENDING":
+        return "Pending";
+      case "IN_PROGRESS":
+        return "In Progress";
+      case "COMPLETED":
+        return "Completed";
+      case "CANCELLED":
+        return "Cancelled";
+      default:
+        return "All";
+    }
+  };
 
   return (
     <div className="min-h-screen p-2 tracking-tighter">
@@ -241,9 +269,15 @@ const ManageQueue = () => {
               </div>
             </div>
 
-            <div className="flex gap-2 mt-2 sm:mt-0">
+            <div className="flex gap-2 mt-2 sm:mt-0 w-2/3 justify-end">
               {(
-                ["waiting", "withDoctor", "completed", "all"] as QueueStatus[]
+                [
+                  "PENDING",
+                  "IN_PROGRESS",
+                  "COMPLETED",
+                  "CANCELLED",
+                  "ALL",
+                ] as QueueStatus[]
               ).map((status) => (
                 <button
                   key={status}
@@ -254,13 +288,7 @@ const ManageQueue = () => {
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
-                  {status === "waiting"
-                    ? "Waiting"
-                    : status === "withDoctor"
-                    ? "With Doctor"
-                    : status === "completed"
-                    ? "Completed"
-                    : "All"}
+                  {getStatusLabel(status)}
                 </button>
               ))}
             </div>
@@ -311,9 +339,10 @@ const ManageQueue = () => {
                       }
                       className="w-full text-xs border rounded px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#035670] appearance-none cursor-pointer"
                     >
-                      <option value="waiting">Waiting</option>
-                      <option value="withDoctor">With Doctor</option>
-                      <option value="completed">Completed</option>
+                      <option value="PENDING">Pending</option>
+                      <option value="IN_PROGRESS">In Progress</option>
+                      <option value="COMPLETED">Completed</option>
+                      <option value="CANCELLED">Cancelled</option>
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none" />
                   </div>
@@ -383,7 +412,7 @@ const ManageQueue = () => {
                   {/* Appointments (Collapsible) */}
                   {isExpanded && (
                     <div className="divide-y">
-                      {appts.map((item: any) => (
+                      {appts.map((item) => (
                         <div
                           key={item.id}
                           className="flex items-center p-3 hover:bg-gray-50"
@@ -419,9 +448,10 @@ const ManageQueue = () => {
                               }
                               className="w-full text-xs border rounded px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#035670] appearance-none cursor-pointer"
                             >
-                              <option value="waiting">Waiting</option>
-                              <option value="withDoctor">With Doctor</option>
-                              <option value="completed">Completed</option>
+                              <option value="PENDING">Pending</option>
+                              <option value="IN_PROGRESS">In Progress</option>
+                              <option value="COMPLETED">Completed</option>
+                              <option value="CANCELLED">Cancelled</option>
                             </select>
                             <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none" />
                           </div>

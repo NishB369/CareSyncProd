@@ -1,6 +1,4 @@
-// src/data/frontDeskHelp.ts
-
-import { Phone, Mail, Calendar, UserCheck } from "lucide-react";
+import { Phone, Mail } from "lucide-react";
 
 export const helpItems = [
   {

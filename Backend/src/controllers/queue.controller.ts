@@ -4,17 +4,20 @@ import { prisma } from "../db/index";
 export const getAllDoctorsQueue = async (req: Request, res: Response) => {
   try {
     const now = new Date();
-    
-    // Get UTC date components
+
     const year = now.getUTCFullYear();
     const month = now.getUTCMonth();
     const date = now.getUTCDate();
 
-    // Create UTC start and end of day
     const startOfDay = new Date(Date.UTC(year, month, date, 0, 0, 0));
     const endOfDay = new Date(Date.UTC(year, month, date, 23, 59, 59, 999));
 
-    console.log("Querying appointments between:", startOfDay.toISOString(), "and", endOfDay.toISOString());
+    console.log(
+      "Querying appointments between:",
+      startOfDay.toISOString(),
+      "and",
+      endOfDay.toISOString()
+    );
 
     const doctors = await prisma.doctor.findMany({
       orderBy: { name: "asc" },
@@ -42,7 +45,9 @@ export const getAllDoctorsQueue = async (req: Request, res: Response) => {
       },
     });
 
-    const filteredDoctors = doctors.filter((doc) => doc.appointments.length > 0);
+    const filteredDoctors = doctors.filter(
+      (doc) => doc.appointments.length > 0
+    );
 
     return res.status(200).json({
       success: true,
@@ -58,8 +63,3 @@ export const getAllDoctorsQueue = async (req: Request, res: Response) => {
     });
   }
 };
-
-
-
-
-

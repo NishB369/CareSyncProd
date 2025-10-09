@@ -1,15 +1,14 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { ChevronDown, X } from "lucide-react";
 
 interface ViewSlotsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  schedule: Record<string, string[]>; // e.g., { MONDAY: ["9:00 AM - 10:00 AM"] }
+  schedule: Record<string, string[]>;
 }
 
-// Map full day names for display
 const dayDisplayNames: Record<string, string> = {
   SUNDAY: "Sunday",
   MONDAY: "Monday",
@@ -20,7 +19,6 @@ const dayDisplayNames: Record<string, string> = {
   SATURDAY: "Saturday",
 };
 
-// Order days from Monday to Sunday (common in clinics)
 const dayOrder = [
   "MONDAY",
   "TUESDAY",
@@ -36,17 +34,14 @@ const ViewSlotsModal = ({ isOpen, onClose, schedule }: ViewSlotsModalProps) => {
 
   if (!isOpen) return null;
 
-  // Get valid days that exist in schedule
   const validScheduleDays = Object.keys(schedule).filter((day) =>
     dayOrder.includes(day)
   );
 
-  // Sort by dayOrder
   const sortedEntries = validScheduleDays
     .sort((a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b))
     .map((day) => [day, schedule[day]] as [string, string[]]);
 
-  // Apply filter if selected
   const filteredEntries = filterDay
     ? sortedEntries.filter(([day]) => day === filterDay)
     : sortedEntries;

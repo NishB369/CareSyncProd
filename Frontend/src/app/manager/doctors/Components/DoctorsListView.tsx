@@ -8,14 +8,14 @@ interface DoctorsListViewProps {
   doctors: Doctor[];
   onEdit: (doctor: Doctor) => void;
   onDelete: (doctor: Doctor) => void;
-  onScheduleUpdate: () => void; // ✅ Renamed and simplified
+  onScheduleUpdate: () => void;
 }
 
 const DoctorsListView = ({
   doctors,
   onEdit,
   onDelete,
-  onScheduleUpdate, // ✅
+  onScheduleUpdate,
 }: DoctorsListViewProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -192,7 +192,7 @@ const DoctorsListView = ({
             onClose={() => handleCloseModal(doctor.id)}
             doctorId={doctor.id}
             currentSchedule={doctor.schedule || {}}
-            onSuccess={onScheduleUpdate} // ✅ Use onSuccess, not onSave
+            onSuccess={onScheduleUpdate}
           />
           <ViewSlotsModal
             isOpen={openModals[doctor.id] === "view"}

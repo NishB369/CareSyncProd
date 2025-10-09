@@ -8,8 +8,8 @@ interface AddSlotsModalProps {
   isOpen: boolean;
   onClose: () => void;
   doctorId: string;
-  currentSchedule: Record<string, string[]>; // e.g., { MONDAY: ["9:00 AM - 10:00 AM"] }
-  onSuccess?: () => void; // Optional: refetch doctors or update UI
+  currentSchedule: Record<string, string[]>;
+  onSuccess?: () => void;
 }
 
 const daysOfWeek = [
@@ -78,7 +78,6 @@ const AddSlotsModal = ({
 
     const newErrors = [...timeErrors];
     if (newSlots[index].start && newSlots[index].end) {
-      // Convert to minutes for comparison
       const startMins = timeToMinutes(newSlots[index].start);
       const endMins = timeToMinutes(newSlots[index].end);
       newErrors[index] = startMins >= endMins;
@@ -88,14 +87,12 @@ const AddSlotsModal = ({
     setTimeErrors(newErrors);
   };
 
-  // Helper: "09:00" → 540 minutes
   const timeToMinutes = (time24: string): number => {
     if (!time24) return 0;
     const [h, m] = time24.split(":").map(Number);
     return h * 60 + m;
   };
 
-  // Helper: "09:00" → "9:00 AM"
   const formatTo12Hour = (time24: string): string => {
     if (!time24) return "";
     const [hoursStr, minutesStr] = time24.split(":");
@@ -138,7 +135,7 @@ const AddSlotsModal = ({
     newSchedule[selectedDay] = [
       ...(newSchedule[selectedDay] || []),
       ...validSlots,
-    ].filter((slot, i, arr) => arr.indexOf(slot) === i); // dedupe
+    ].filter((slot, i, arr) => arr.indexOf(slot) === i);
 
     try {
       const response = await axios.put(

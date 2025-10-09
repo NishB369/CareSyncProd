@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react"; // ✅ add useState
-import { X, AlertTriangle, Loader2 } from "lucide-react"; // ✅ add Loader2 for spinner
+import React, { useState } from "react";
+import { X, AlertTriangle, Loader2 } from "lucide-react";
 import axios from "axios";
 
 interface CancelConfirmationModalProps {
@@ -22,7 +22,7 @@ const CancelConfirmationModal = ({
   onSuccess,
   appointment,
 }: CancelConfirmationModalProps) => {
-  const [isLoading, setIsLoading] = useState(false); // ✅ loading state
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
@@ -44,7 +44,7 @@ const CancelConfirmationModal = ({
   });
 
   const handleConfirm = async () => {
-    setIsLoading(true); // ✅ start loading
+    setIsLoading(true);
     try {
       const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
       if (!baseUrl) {
@@ -61,7 +61,7 @@ const CancelConfirmationModal = ({
       console.error("Failed to cancel appointment:", error);
       alert("Failed to cancel appointment. Please try again.");
     } finally {
-      setIsLoading(false); // ✅ stop loading (on success OR error)
+      setIsLoading(false);
     }
   };
 
@@ -86,7 +86,7 @@ const CancelConfirmationModal = ({
           </h2>
           <button
             onClick={onClose}
-            disabled={isLoading} // ✅ disable close while loading (optional)
+            disabled={isLoading}
             className="text-gray-500 hover:text-gray-800 rounded-full p-1 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-50"
             aria-label="Close modal"
           >

@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { prisma } from "../db/index";
-// import { sendAppointmentEmail } from "./email.controller";
 import { AppointmentStatus, GenderType, QueueType } from "@prisma/client";
 
 const timeToMinutes = (time: string): number | null => {
@@ -69,8 +68,7 @@ const scheduleAppointment = async (req: Request, res: Response) => {
       doctorId,
       slot,
       appointmentDate,
-      visitType,
-      queueType, // ✅ FIXED: Added queueType
+      queueType,
       patientName,
       patientEmail,
       patientPhoneNumber,
@@ -123,7 +121,6 @@ const scheduleAppointment = async (req: Request, res: Response) => {
       .toLocaleDateString("en-US", { weekday: "long" })
       .toUpperCase();
 
-    // Normalize doctor schedule keys to uppercase to avoid casing issues
     const rawSchedule = existingDoctor.schedule as Record<string, unknown>;
     const normalizedSchedule: Record<string, string[]> = {};
     for (const [key, value] of Object.entries(rawSchedule)) {
@@ -204,31 +201,12 @@ const scheduleAppointment = async (req: Request, res: Response) => {
         doctorId,
         appointmentDate: new Date(appointmentDate),
         patientId: patient.id,
-        queueType: (queueType?.toUpperCase() as QueueType) || "APPOINTMENT", // ✅ FIXED: Now uses the variable with default
+        queueType: (queueType?.toUpperCase() as QueueType) || "APPOINTMENT",
         slot,
         queueNumber,
         appointmentCode: `APPT-${Date.now()}`,
       },
     });
-
-    // try {
-    //   await sendAppointmentEmail(
-    //     {
-    //       body: {
-    //         to: [patientEmail, existingDoctor.user?.email],
-    //         doctorName: existingDoctor.name,
-    //         appointmentTime: `${slot} on ${new Date(
-    //           appointmentDate
-    //         ).toLocaleDateString()}`,
-    //         doctorImage: existingDoctor.image,
-    //         appointmentId: createAppointment.id,
-    //       },
-    //     } as unknown as Request,
-    //     {} as Response
-    //   );
-    // } catch (emailError) {
-    //   console.error("Failed to send appointment email:", emailError);
-    // }
 
     return res.status(201).json({
       message: "Appointment scheduled",
@@ -308,7 +286,7 @@ const editAppointment = async (req: Request, res: Response) => {
     const {
       slot,
       appointmentDate,
-      queueType, // ✅ FIXED: Added queueType
+      queueType,
       status,
       patientName,
       patientEmail,
@@ -405,7 +383,7 @@ const editAppointment = async (req: Request, res: Response) => {
         appointmentDate: newDate,
         queueType: queueType
           ? (queueType.toUpperCase() as QueueType)
-          : appointment.queueType, // ✅ FIXED: Now properly defined
+          : appointment.queueType,
         status: status ?? appointment.status,
       },
     });
@@ -614,6 +592,81 @@ const changeAppointmentStatus = async (req: Request, res: Response) => {
   }
 };
 
+const getAppointmentByCode = async (req: Request, res: Response) => {
+  try {
+    const { appointmentCode } = req.params;
+
+    if (!appointmentCode) {
+      return res.status(400).json({
+        success: false,
+        message: "Appointment code is required",
+      });
+    }
+
+    const appointment = await prisma.appointment.findFirst({
+      where: {
+        appointmentCode: appointmentCode,
+      },
+      include: {
+        doctor: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            phoneNumber: true,
+            gender: true,
+            specialization: true,
+            isAvailable: true,
+          },
+        },
+        patient: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phoneNumber: true,
+            age: true,
+            gender: true,
+            issue: true,
+            address: true,
+          },
+        },
+      },
+    });
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        id: appointment.id,
+        appointmentCode: appointment.appointmentCode,
+        queueNumber: appointment.queueNumber,
+        appointmentDate: appointment.appointmentDate,
+        slot: appointment.slot,
+        queueType: appointment.queueType,
+        status: appointment.status,
+        doctor: appointment.doctor,
+        patient: appointment.patient,
+        createdAt: appointment.createdAt,
+        updatedAt: appointment.updatedAt,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching appointment:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
 export {
   scheduleAppointment,
   editAppointment,
@@ -623,4 +676,5 @@ export {
   getAppointmentById,
   getDoctorAppointment,
   changeAppointmentStatus,
+  getAppointmentByCode,
 };

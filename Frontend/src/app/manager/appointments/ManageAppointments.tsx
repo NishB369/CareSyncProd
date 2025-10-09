@@ -9,18 +9,7 @@ import CancelConfirmationModal from "./Modals/CancelConfirmationModal";
 import axios from "axios";
 import RescheduleAppointmentModal from "./Modals/RescheduleAppointmentModal";
 
-const LoadingShimmer = () => {
-  return (
-    <div className="flex flex-col items-center justify-center py-12">
-      <div className="w-16 h-16 rounded-full bg-gray-200 animate-pulse mb-4" />
-      <div className="h-4 bg-gray-200 rounded w-48 animate-pulse mb-2" />
-      <div className="h-3 bg-gray-200 rounded w-32 animate-pulse" />
-    </div>
-  );
-};
-
-// Fixed "today" for consistent demo
-export const TODAY = new Date(2025, 9, 5); // Oct 5, 2025
+export const TODAY = new Date();
 
 type StatusFilter =
   | "PENDING"
@@ -30,38 +19,34 @@ type StatusFilter =
   | "RESCHEDULED"
   | "ALL";
 
-// UI-facing Appointment type
-// UI-facing Appointment type (updated)
 export type Appointment = {
   id: string;
-  appointmentCode: string; // ← added
+  appointmentCode: string;
   patient: {
     name: string;
     phone: string;
     age: number;
-    gender?: string; // ← added
-    issue?: string; // ← added
+    gender?: string;
+    issue?: string;
   };
   doctor: {
     id: string;
     name: string;
     specialization: string;
-    image?: string; // ← added (URL or undefined)
-    // location removed per your request
+    image?: string;
   };
   startTime: Date;
   endTime: Date;
   status: StatusFilter;
 };
 
-// API response shape – matches your actual payload
 type ApiAppointment = {
   id: string;
   doctorId: string;
   patientId: string;
   queueNumber: number;
-  appointmentDate: string; // ISO string: "2025-10-10T00:00:00.000Z"
-  slot: string; // e.g., "11:49AM-12:50PM"
+  appointmentDate: string;
+  slot: string;
   queueType: string;
   status: "PENDING" | "COMPLETED" | "CANCELLED" | "RESCHEDULED";
   createdAt: string;
@@ -94,7 +79,7 @@ const ManageAppointments = () => {
   };
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const today = new Date();
-    return formatDate(today); // Use the formatDate function from Option 2
+    return formatDate(today);
   });
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [doctorFilter, setDoctorFilter] = useState<string>("ALL");
@@ -114,7 +99,6 @@ const ManageAppointments = () => {
     setRescheduleModalOpen(true);
   };
 
-  // Parse time like "11:49AM" → { hours, minutes }
   const parseTime = (timeStr: string) => {
     const clean = timeStr.trim();
     const isPM = clean.includes("PM");
@@ -143,25 +127,23 @@ const ManageAppointments = () => {
     const endTime = new Date(aptDate);
     endTime.setHours(endH, endM, 0, 0);
 
-    // Map PENDING → BOOKED for UI
     const status: StatusFilter = apiApt.status;
 
     return {
       id: apiApt.id,
-      appointmentCode: apiApt.appointmentCode, // ✅
+      appointmentCode: apiApt.appointmentCode,
       patient: {
         name: apiApt.patient.name,
         phone: apiApt.patient.phoneNumber,
         age: apiApt.patient.age,
-        gender: apiApt.patient.gender, // ✅
-        issue: apiApt.patient.issue, // ✅
+        gender: apiApt.patient.gender,
+        issue: apiApt.patient.issue,
       },
       doctor: {
         id: apiApt.doctor.id,
         name: apiApt.doctor.name,
         specialization: apiApt.doctor.specialization,
-        image: apiApt.doctor.image, // ✅ (can be undefined)
-        // location: removed
+        image: apiApt.doctor.image,
       },
       startTime,
       endTime,
@@ -459,7 +441,7 @@ const ManageAppointments = () => {
       <CancelConfirmationModal
         isOpen={cancelModalOpen}
         onClose={() => setCancelModalOpen(false)}
-        onSuccess={fetchAppointments} // ✅ This will refresh the list
+        onSuccess={fetchAppointments}
         appointment={selectedAppointment!}
       />
 
