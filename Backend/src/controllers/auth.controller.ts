@@ -11,7 +11,7 @@ export const login = async (req: Request, res: Response) => {
     secure: true,
     sameSite: "none" as const,
     path: "/",
-    maxAge: 1000 * 60 * 60 * 24,
+    maxAge: 1000 * 60 * 60 * 24 * 10,
     domain: undefined,
   });
 
