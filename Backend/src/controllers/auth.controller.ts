@@ -9,7 +9,7 @@ export const login = async (req: Request, res: Response) => {
   res.cookie("careSyncAccessToken", accessToken, {
     httpOnly: true,
     secure: true,
-    sameSite: "none" as const,
+    sameSite: "lax" as const,
     path: "/",
     maxAge: 1000 * 60 * 60 * 24,
   });
