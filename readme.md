@@ -4,6 +4,7 @@ A comprehensive healthcare management system for efficient patient appointment s
 
 - Live Preview : [CareSync](https://care-sync-prod.vercel.app/)</br>
 - Github Repo : [CareSyncProd](https://github.com/NishB369/CareSyncProd)
+- Demo Video : [YouTube Video](https://www.youtube.com/watch?v=jOoPzpE6Ytg)
 
 </br>
 
@@ -14,7 +15,7 @@ A comprehensive healthcare management system for efficient patient appointment s
 CareSync is a full-stack healthcare management platform designed to streamline clinic operations. It provides an intuitive interface for managing doctors, scheduling appointments, and organizing patient queues - supporting both pre-booked and walk-in patients.
 
 - Frontend - Deployed on Vercel
-</br>
+  </br>
 - Backend - Deployed on Render
 
 ## Features
@@ -90,6 +91,8 @@ caresync/
 │   │   ├── app/
 │   │   │   ├── alertpage/
 │   │   │   ├── auth/login/manager/
+|   |   |   ├── documentation/
+|   |   |   ├── landingpage/
 │   │   │   └── manager/
 │   │   │       ├── appointments/
 │   │   │       ├── doctors/
@@ -240,7 +243,7 @@ This project is licensed under the ISC License.
 ## Authors
 
 - Nishchay Bhatia  
-    [LinkedIn](https://www.linkedin.com/in/nishchay-bhatia) | [GitHub](https://github.com/nishb369) | [Email](mailto:nishbcodes@gmail.com)
+   [LinkedIn](https://www.linkedin.com/in/nishchay-bhatia) | [GitHub](https://github.com/nishb369) | [Email](mailto:nishbcodes@gmail.com)
 
 ---
 

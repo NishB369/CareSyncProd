@@ -545,6 +545,7 @@ const changeAppointmentStatus = async (req: Request, res: Response) => {
 
     const validStatuses: AppointmentStatus[] = [
       "PENDING",
+      "IN_PROGRESS",
       "COMPLETED",
       "CANCELLED",
     ];

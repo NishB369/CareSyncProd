@@ -12,6 +12,7 @@ import {
   ClipboardClock,
   TextWrap,
 } from "lucide-react";
+import axios from "axios";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
@@ -65,9 +66,23 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const activeSection = getActiveSection();
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    router.push("/auth/login/manager");
+  const handleLogout = async () => {
+    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    try {
+      await axios.post(
+        `${baseUrl}/api/auth/logout`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+
+      localStorage.removeItem("user");
+
+      router.push("/auth/login/manager");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   useEffect(() => {
