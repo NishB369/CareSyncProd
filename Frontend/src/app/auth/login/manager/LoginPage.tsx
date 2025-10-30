@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Eye, EyeOff, Loader } from "lucide-react";
+import { Eye, EyeOff, Loader, Copy, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -14,8 +14,12 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
+
+  const testEmail = "care@sync.com";
+  const testPassword = "qwerty123";
 
   useEffect(() => {
     setIsMounted(true);
@@ -97,8 +101,51 @@ const LoginPage = () => {
     }
   }, [isMounted]);
 
+  // Copy credentials to clipboard
+  const copyCredentials = async () => {
+    const text = `Email: ${testEmail}\nPassword: ${testPassword}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
+  // Typewriter animation for auto-fill
+  const typeText = (
+    text: string,
+    setter: (val: string) => void,
+    delay = 50
+  ) => {
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i <= text.length) {
+        setter(text.slice(0, i));
+        i++;
+      } else {
+        clearInterval(interval);
+      }
+    }, delay);
+  };
+
+  const autoFillCredentials = () => {
+    setEmail("");
+    setPassword("");
+    setIsEmailValid(true);
+    if (error) setError(null);
+
+    // Type email
+    typeText(testEmail, setEmail, 60);
+    // Type password with slight delay
+    setTimeout(() => {
+      typeText(testPassword, setPassword, 60);
+    }, 300);
+  };
+
   return (
-    <div className="h-screen w-screen flex items-center justify-center px-60 py-32">
+    <div className="h-screen w-screen flex items-center justify-center px-60 py-32 relative">
       <div
         className="absolute inset-0 opacity-5 -z-50"
         style={{
@@ -244,6 +291,36 @@ const LoginPage = () => {
           </div>
         </form>
       </div>
+
+      {/* Copy Credentials Helper (bottom-right) */}
+      <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-white/80 backdrop-blur-sm px-3 py-2 rounded-md shadow-sm border border-gray-200">
+        <span
+          className="text-xs text-gray-600 font-mono cursor-pointer hover:text-gray-900"
+          onClick={copyCredentials}
+          aria-label="Copy test credentials"
+        >
+          {testEmail} / {testPassword}
+        </span>
+        <div className="flex gap-1">
+          <Copy
+            size={14}
+            className="text-gray-500 hover:text-gray-700 cursor-pointer"
+            onClick={copyCredentials}
+          />
+          <ArrowUpRight
+            size={14}
+            className="text-white w-4 h-4 rounded-full bg-[#035670] hover:animate-none cursor-pointer animate-bounce"
+            onClick={autoFillCredentials}
+          />
+        </div>
+      </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="absolute bottom-16 right-4 bg-gray-800 text-white text-xs px-3 py-2 rounded-md animate-fade-in-up">
+          Copied!
+        </div>
+      )}
 
       {/* Global Styles for Animations */}
       <style jsx global>{`

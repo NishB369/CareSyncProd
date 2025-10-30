@@ -67,6 +67,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const activeSection = getActiveSection();
 
   const handleLogout = async () => {
+    console.log("🔴 LOGOUT CALLED!");
+    console.trace();
     const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     try {
       await axios.post(
