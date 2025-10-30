@@ -8,8 +8,8 @@ export const login = async (req: Request, res: Response) => {
 
   res.cookie("careSyncAccessToken", accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: true,
+    sameSite: "none" as const,
     path: "/",
     maxAge: 1000 * 60 * 60 * 24,
     domain: undefined,
