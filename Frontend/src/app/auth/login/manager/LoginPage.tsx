@@ -54,16 +54,14 @@ const LoginPage = () => {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
-        { email, password },
-        { withCredentials: true }
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
       );
-
-      console.log("✅ Login successful");
-
-      // ADD THIS DELAY - Wait for cookie to be set properly
-      await new Promise((resolve) => setTimeout(resolve, 3000)); // 1 second delay
-
-      console.log("🍪 Cookies after delay:", document.cookie);
 
       router.push("/manager/doctors");
     } catch (err: any) {
