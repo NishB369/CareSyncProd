@@ -21,41 +21,13 @@ export default function CareSync() {
   const [animatedElements, setAnimatedElements] = useState<Set<string>>(
     new Set()
   );
-  const [isLaptop, setIsLaptop] = useState(true);
 
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const benefitsRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const checkDeviceType = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-
-      // Laptop detection logic:
-      // - Width between 1024px and 1920px (typical laptop range)
-      // - Height between 600px and 1200px (typical laptop range)
-      // - Exclude mobile/tablet dimensions
-      const isLaptopScreen =
-        width >= 1024 &&
-        width <= 1920 &&
-        height >= 600 &&
-        height <= 1200 &&
-        !/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        );
-
-      setIsLaptop(isLaptopScreen);
-    };
-
-    checkDeviceType();
-
-    window.addEventListener("resize", checkDeviceType);
-    return () => window.removeEventListener("resize", checkDeviceType);
-  }, []);
-
   const toDashboard = () => {
-    isLaptop ? router.push("/auth/login/manager") : router.push("/alertpage");
+    router.push("/auth/login/manager");
   };
 
   useEffect(() => {
